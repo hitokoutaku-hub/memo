@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>作業カレンダー</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+:root {
+  --bg: #f2f0eb;
+  --card: #ffffff;
+  --accent: #1a5fa8;
+  --accent2: #e8380d;
+  --text: #1e1e1e;
+  --sub: #888;
+  --border: #ddd8cc;
+  --today: #1a5fa8;
+  --selected: #e8380d;
+  --tag-work: #1a5fa8;
+  --tag-reserve: #27ae60;
+  --tag-deal: #8e44ad;
+  --tag-tel: #e8380d;
+  --tag-memo: #e67e22;
+  --done: #bbb;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 15px;
+}
+
+/* HEADER */
+.header {
+  background: var(--accent);
+  color: #fff;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.header h1 { font-size: 18px; font-weight: 900; }
+.header-nav { display: flex; align-items: center; gap: 10px; }
+.nav-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.month-label { font-size: 16px; font-weight: 700; min-width: 90px; text-align: center; }
+
+/* CALENDAR */
+.calendar-wrap {
+  background: var(--card);
+  padding: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+}
+.weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--sub);
+  padding: 4px 0;
+}
+.weekday:first-child { color: #c0392b; }
+.weekday:last-child { color: var(--accent); }
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.day-cell {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.1s;
+  min-height: 44px;
+}
+.day-cell:active { background: var(--bg); }
+.day-num {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+.day-cell.empty { cursor: default; }
+.day-cell.today .day-num {
+  background: var(--today);
+  color: #fff;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.day-cell.selected .day-num {
+  background: var(--selected);
+  color: #fff;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+.day-cell.sun .day-num { color: #c0392b; }
+.day-cell.sat .day-num { color: var(--accent); }
+.day-cell.today.sun .day-num,
+.day-cell.selected.sun .day-num,
+.day-cell.today.sat .day-num,
+.day-cell.selected.sat .day-num { color: #fff; }
+
+/* メモドット */
+.memo-dots {
+  display: flex;
+  gap: 2px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 32px;
+}
+.memo-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+}
+
+/* 選択日エリア */
+.selected-day-area {
+  padding: 14px;
+  max-width: 680px;
+  margin: 0 auto;
+  padding-bottom: 100px;
+}
+.selected-label {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--selected);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 入力エリア */
+.input-card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  border: 1.5px solid var(--border);
+}
+.tag-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.tag-btn {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--sub);
+  transition: all 0.15s;
+}
+.tag-btn.sel-作業 { background: var(--tag-work); border-color: var(--tag-work); color: #fff; }
+.tag-btn.sel-予約 { background: var(--tag-reserve); border-color: var(--tag-reserve); color: #fff; }
+.tag-btn.sel-交渉 { background: var(--tag-deal); border-color: var(--tag-deal); color: #fff; }
+.tag-btn.sel-電話 { background: var(--tag-tel); border-color: var(--tag-tel); color: #fff; }
+.tag-btn.sel-メモ { background: var(--tag-memo); border-color: var(--tag-memo); color: #fff; }
+
+.memo-textarea {
+  width: 100%;
+  border: none;
+  background: #fafaf8;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 16px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  line-height: 1.8;
+  resize: none;
+  min-height: 72px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 8px;
+}
+.memo-textarea:focus { border-color: var(--accent); }
+.memo-textarea::placeholder { color: #ccc; }
+
+.input-bottom {
+  display: flex;
+  justify-content: flex-end;
+}
+.btn-add {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* メモアイテム */
+.memo-item {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  border-left: 4px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.memo-item.tag-作業 { border-left-color: var(--tag-work); }
+.memo-item.tag-予約 { border-left-color: var(--tag-reserve); }
+.memo-item.tag-交渉 { border-left-color: var(--tag-deal); }
+.memo-item.tag-電話 { border-left-color: var(--tag-tel); }
+.memo-item.tag-メモ { border-left-color: var(--tag-memo); }
+.memo-item.done { opacity: 0.5; }
+
+.memo-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+.tag-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: #fff;
+}
+.tag-badge.tag-作業 { background: var(--tag-work); }
+.tag-badge.tag-予約 { background: var(--tag-reserve); }
+.tag-badge.tag-交渉 { background: var(--tag-deal); }
+.tag-badge.tag-電話 { background: var(--tag-tel); }
+.tag-badge.tag-メモ { background: var(--tag-memo); }
+
+.memo-time { font-size: 11px; color: var(--sub); margin-left: auto; }
+
+.memo-text {
+  font-size: 15px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.memo-item.done .memo-text {
+  text-decoration: line-through;
+  color: var(--done);
+}
+
+.memo-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+.btn-check {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--sub);
+}
+.memo-item.done .btn-check { color: var(--tag-work); border-color: var(--tag-work); }
+.btn-del-memo {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--sub);
+  margin-left: auto;
+}
+
+.empty-day {
+  text-align: center;
+  color: var(--sub);
+  padding: 30px;
+  font-size: 14px;
+}
+
+/* 底部ボタン */
+.bottom-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  padding: 10px 14px;
+  display: flex;
+  gap: 8px;
+  z-index: 100;
+}
+.btn-line-share {
+  flex: 1;
+  padding: 11px;
+  background: #06c755;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-clear-done {
+  padding: 11px 14px;
+  background: var(--bg);
+  color: var(--sub);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📅 作業カレンダー</h1>
+  <div class="header-nav">
+    <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+    <span class="month-label" id="monthLabel"></span>
+    <button class="nav-btn" onclick="changeMonth(1)">›</button>
+  </div>
+</div>
+
+<div class="calendar-wrap">
+  <div class="weekdays">
+    <div class="weekday">日</div>
+    <div class="weekday">月</div>
+    <div class="weekday">火</div>
+    <div class="weekday">水</div>
+    <div class="weekday">木</div>
+    <div class="weekday">金</div>
+    <div class="weekday">土</div>
+  </div>
+  <div class="days-grid" id="daysGrid"></div>
+</div>
+
+<div class="selected-day-area" id="selectedDayArea"></div>
+
+<div class="bottom-bar">
+  <button class="btn-clear-done" onclick="clearDone()">完了を削除</button>
+  <button class="btn-line-share" onclick="shareToLine()">💬 LINEで共有</button>
+</div>
+
+<script>
+// データ管理
+let allMemos = JSON.parse(localStorage.getItem('cal_memos') || '{}');
+// { "2026-03-24": [{id, tag, text, done, time}, ...] }
+
+function saveMemos() {
+  localStorage.setItem('cal_memos', JSON.stringify(allMemos));
+}
+
+// 状態
+const today = new Date();
+let viewYear = today.getFullYear();
+let viewMonth = today.getMonth();
+let selectedDateStr = toDateStr(today);
+let selectedTag = '作業';
+
+function toDateStr(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+
+function todayStr() { return toDateStr(today); }
+
+// タグカラー
+const tagColors = {
+  '作業': '#1a5fa8',
+  '予約': '#27ae60',
+  '交渉': '#8e44ad',
+  '電話': '#e8380d',
+  'メモ': '#e67e22',
+};
+
+function selectTag(tag) {
+  selectedTag = tag;
+  document.querySelectorAll('.tag-btn').forEach(b => {
+    b.className = 'tag-btn';
+    if (b.dataset.tag === tag) b.className = 'tag-btn sel-' + tag;
+  });
+}
+
+function changeMonth(dir) {
+  viewMonth += dir;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  renderCalendar();
+}
+
+function selectDate(dateStr) {
+  selectedDateStr = dateStr;
+  renderCalendar();
+  renderSelectedDay();
+  // スクロール
+  setTimeout(() => {
+    document.getElementById('selectedDayArea').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 50);
+}
+
+function renderCalendar() {
+  document.getElementById('monthLabel').textContent =
+    viewYear + '年' + (viewMonth+1) + '月';
+
+  const grid = document.getElementById('daysGrid');
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+
+  let html = '';
+
+  // 空白
+  for (let i = 0; i < firstDay; i++) {
+    html += '<div class="day-cell empty"></div>';
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = viewYear + '-' +
+      String(viewMonth+1).padStart(2,'0') + '-' +
+      String(d).padStart(2,'0');
+    const dow = new Date(viewYear, viewMonth, d).getDay();
+    const isToday = dateStr === todayStr();
+    const isSel = dateStr === selectedDateStr;
+    const memos = allMemos[dateStr] || [];
+
+    let cls = 'day-cell';
+    if (dow === 0) cls += ' sun';
+    if (dow === 6) cls += ' sat';
+    if (isToday && !isSel) cls += ' today';
+    if (isSel) cls += ' selected';
+
+    // ドット
+    const dots = memos.slice(0,5).map(m =>
+      `<div class="memo-dot" style="background:${tagColors[m.tag]||'#888'};${m.done?'opacity:0.3':''}"></div>`
+    ).join('');
+
+    html += `
+      <div class="${cls}" onclick="selectDate('${dateStr}')">
+        <span class="day-num">${d}</span>
+        ${memos.length > 0 ? `<div class="memo-dots">${dots}</div>` : ''}
+      </div>
+    `;
+  }
+
+  grid.innerHTML = html;
+}
+
+function renderSelectedDay() {
+  const area = document.getElementById('selectedDayArea');
+  const d = new Date(selectedDateStr + 'T00:00:00');
+  const label = d.toLocaleDateString('ja-JP', {month:'long', day:'numeric', weekday:'long'});
+  const memos = allMemos[selectedDateStr] || [];
+
+  const pending = memos.filter(m => !m.done);
+  const done = memos.filter(m => m.done);
+
+  const memoHtml = [...pending, ...done].map(m => `
+    <div class="memo-item tag-${m.tag} ${m.done?'done':''}">
+      <div class="memo-top">
+        <span class="tag-badge tag-${m.tag}">${m.tag}</span>
+        ${m.done ? '<span style="font-size:11px;color:var(--done);font-weight:700">完了</span>' : ''}
+        <span class="memo-time">${m.time}</span>
+      </div>
+      <div class="memo-text">${escHtml(m.text)}</div>
+      <div class="memo-actions">
+        <button class="btn-check" onclick="toggleDone('${selectedDateStr}',${m.id})">
+          ${m.done ? '↩ 戻す' : '✓ 完了'}
+        </button>
+        <button class="btn-del-memo" onclick="deleteMemo('${selectedDateStr}',${m.id})">削除</button>
+      </div>
+    </div>
+  `).join('');
+
+  area.innerHTML = `
+    <div class="selected-label">
+      📅 ${label}
+      <span style="font-size:12px;color:var(--sub);font-weight:400">${memos.length}件のメモ</span>
+    </div>
+
+    <div class="input-card">
+      <div class="tag-row" id="tagRow">
+        ${['作業','予約','交渉','電話','メモ'].map(t =>
+          `<button class="tag-btn ${t===selectedTag?'sel-'+t:''}" data-tag="${t}" onclick="selectTag('${t}')">${t}</button>`
+        ).join('')}
+      </div>
+      <textarea class="memo-textarea" id="memoInput" placeholder="ここにメモを書く…&#10;例）山田さん エルフ 午後2時入庫&#10;Shift+Enterで改行、Enterで書き込み" rows="3"></textarea>
+      <div class="input-bottom">
+        <button class="btn-add" onclick="addMemo()">書き込む</button>
+      </div>
+    </div>
+
+    ${memos.length === 0
+      ? '<div class="empty-day">まだメモはありません</div>'
+      : memoHtml
+    }
+  `;
+
+  // イベント再設定
+  const ta = document.getElementById('memoInput');
+  if (ta) {
+    ta.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        addMemo();
+      }
+    });
+  }
+}
+
+function addMemo() {
+  const ta = document.getElementById('memoInput');
+  const text = ta.value.trim();
+  if (!text) return;
+
+  if (!allMemos[selectedDateStr]) allMemos[selectedDateStr] = [];
+  const now = new Date();
+  allMemos[selectedDateStr].push({
+    id: Date.now(),
+    tag: selectedTag,
+    text,
+    done: false,
+    time: now.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit'})
+  });
+
+  saveMemos();
+  ta.value = '';
+  renderCalendar();
+  renderSelectedDay();
+}
+
+function toggleDone(dateStr, id) {
+  const memos = allMemos[dateStr] || [];
+  const m = memos.find(m => m.id === id);
+  if (m) {
+    m.done = !m.done;
+    saveMemos();
+    renderCalendar();
+    renderSelectedDay();
+  }
+}
+
+function deleteMemo(dateStr, id) {
+  if (!confirm('削除しますか？')) return;
+  allMemos[dateStr] = (allMemos[dateStr] || []).filter(m => m.id !== id);
+  saveMemos();
+  renderCalendar();
+  renderSelectedDay();
+}
+
+function clearDone() {
+  const memos = allMemos[selectedDateStr] || [];
+  const doneCount = memos.filter(m => m.done).length;
+  if (doneCount === 0) { alert('完了済みのメモはありません'); return; }
+  if (!confirm(`完了済み${doneCount}件を削除しますか？`)) return;
+  allMemos[selectedDateStr] = memos.filter(m => !m.done);
+  saveMemos();
+  renderCalendar();
+  renderSelectedDay();
+}
+
+function shareToLine() {
+  const d = new Date(selectedDateStr + 'T00:00:00');
+  const label = d.toLocaleDateString('ja-JP', {month:'long', day:'numeric', weekday:'short'});
+  const memos = allMemos[selectedDateStr] || [];
+
+  if (memos.length === 0) { alert('この日のメモがありません'); return; }
+
+  let text = `【${label}の作業メモ】\n─────────────\n`;
+  const pending = memos.filter(m => !m.done);
+  const done = memos.filter(m => m.done);
+
+  pending.forEach(m => { text += `[${m.tag}] ${m.text}\n`; });
+  if (done.length > 0) {
+    text += `─────────────\n✅ 完了(${done.length}件)\n`;
+    done.forEach(m => { text += `✓ ${m.text}\n`; });
+  }
+
+  window.open('https://line.me/R/share?text=' + encodeURIComponent(text), '_blank');
+}
+
+function escHtml(str) {
+  return str
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/\n/g,'<br>');
+}
+
+// 初期化
+renderCalendar();
+renderSelectedDay();
+</script>
+</body>
+</html>
