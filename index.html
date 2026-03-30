@@ -52,7 +52,7 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
   background-image:
     linear-gradient(to right, #d8d4c8 1px, transparent 1px),
     linear-gradient(to bottom, #d8d4c8 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-size: 28px 28px;
 }
 .memo-textarea {
   position: absolute; inset: 0;
@@ -63,7 +63,7 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
   font-size: 16px;
   font-family: 'Noto Sans JP', sans-serif;
   color: var(--text);
-  line-height: 24px;
+  line-height: 28px;
   resize: none;
   overflow-y: auto;
 }
@@ -125,7 +125,7 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
   background-image:
     linear-gradient(to right, #d8d4c8 1px, transparent 1px),
     linear-gradient(to bottom, #d8d4c8 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-size: 28px 28px;
 }
 #drawCanvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; background: transparent; }
 
@@ -327,7 +327,7 @@ function addMemo() {
   allMemos[selectedDateStr].push({
     id:Date.now(), tag:selectedTag, text, done:false,
     color: textColor,
-    time:now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
+    time:now.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+'  '+now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
   });
   saveMemos(); ta.value='';
   renderMemoList(); updateLineBtn();
@@ -355,6 +355,7 @@ function renderMemoList() {
       </div>
       <div class="memo-btns">
         <button class="btn-sm" onclick="toggleDone(${m.id})">${m.done?'↩':'✓'}</button>
+        <button class="btn-sm" onclick="editMemo(${m.id})">✏️</button>
         <button class="btn-sm" onclick="deleteMemo(${m.id})">✕</button>
       </div>
     </div>`;
@@ -465,7 +466,7 @@ function saveCanvas() {
   const dataUrl=canvas.toDataURL('image/png');
   if(!allCanvases[selectedDateStr])allCanvases[selectedDateStr]=[];
   const now=new Date();
-  allCanvases[selectedDateStr].push({id:Date.now(),data:dataUrl,time:now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})});
+  allCanvases[selectedDateStr].push({id:Date.now(),data:dataUrl,time:now.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+'  '+now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})});
   saveCanvases();
   ctx.clearRect(0,0,canvas.width,canvas.height);
   renderSavedBar();alert('保存しました！');
@@ -524,6 +525,15 @@ function selectDate(ds){
   if(currentMode==='canvas'&&ctx)ctx.clearRect(0,0,canvas.width,canvas.height);
 }
 
+function editMemo(id) {
+  const memos = allMemos[selectedDateStr]||[];
+  const m = memos.find(m=>m.id===id);
+  if (!m) return;
+  const newText = prompt('メモを編集', m.text);
+  if (newText === null) return;
+  m.text = newText.trim();
+  saveMemos(); renderMemoList();
+}
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 
 // INIT
