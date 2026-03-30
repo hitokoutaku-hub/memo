@@ -13,23 +13,15 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; overflow: hidden; }
-
-/* HEADER */
 .header { background: #1e1e1e; color: #fff; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
 .header-left { display: flex; align-items: center; gap: 10px; }
 .header h1 { font-size: 16px; font-weight: 900; }
 .header-date { font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 700; }
 .btn-cal { background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 20px; width: 38px; height: 38px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-/* MODE TABS */
 .mode-tabs { display: flex; background: #fff; border-bottom: 1px solid var(--border); flex-shrink: 0; }
 .mode-tab { flex: 1; padding: 8px; text-align: center; font-size: 12px; font-weight: 700; color: var(--sub); cursor: pointer; border-bottom: 2px solid transparent; }
 .mode-tab.active { color: #1e1e1e; border-bottom-color: #1e1e1e; }
-
-/* ===== テキストモード ===== */
 .text-mode { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-
-/* TAG + ADD BAR */
 .tag-bar { background: #fff; border-bottom: 1px solid var(--border); padding: 8px 12px; display: flex; align-items: center; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: space-between; }
 .tag-bar-left { display: flex; gap: 5px; flex-wrap: wrap; }
 .tag-btn { padding: 5px 9px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--sub); white-space: nowrap; }
@@ -42,39 +34,12 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
 .tag-btn[data-tag="メモ"].sel { background: var(--c-メモ); }
 .tag-btn[data-tag="重要メモ"].sel { background: var(--c-重要); color: #333; }
 .btn-add-top { background: #1e1e1e; color: #fff; border: none; border-radius: 8px; padding: 7px 16px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; }
-
-/* TEXT INPUT - 方眼背景 */
-.text-input-wrap {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  background: #fffef8;
-  background-image:
-    linear-gradient(to right, #d8d4c8 1px, transparent 1px),
-    linear-gradient(to bottom, #d8d4c8 1px, transparent 1px);
-  background-size: 32px 32px;
-}
-.memo-textarea {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  border: none; outline: none;
-  background: transparent;
-  padding: 8px 14px 10px;
-  font-size: 16px;
-  font-family: 'Noto Sans JP', sans-serif;
-  color: var(--text);
-  line-height: 32px;
-  resize: none;
-  overflow-y: auto;
-}
-
-/* COLOR PICKER BAR */
+.text-input-wrap { flex: 1; position: relative; overflow: hidden; background: #fffef8; background-image: linear-gradient(to right, #d8d4c8 1px, transparent 1px), linear-gradient(to bottom, #d8d4c8 1px, transparent 1px); background-size: 32px 32px; }
+.memo-textarea { position: absolute; inset: 0; width: 100%; height: 100%; border: none; outline: none; background: transparent; padding: 8px 14px 10px; font-size: 16px; font-family: 'Noto Sans JP', sans-serif; color: var(--text); line-height: 32px; resize: none; overflow-y: auto; }
 .color-bar { background: #fff; border-top: 1px solid var(--border); padding: 6px 12px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .color-label { font-size: 10px; color: var(--sub); font-weight: 700; }
 .c-btn { width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; flex-shrink: 0; transition: border-color 0.1s; }
 .c-btn.active { border-color: #1e1e1e; transform: scale(1.2); }
-
-/* MEMO LIST */
 .memo-list-area { max-height: 35vh; overflow-y: auto; border-top: 2px solid var(--border); background: var(--bg); flex-shrink: 0; }
 .memo-item { background: var(--card); padding: 8px 12px; border-left: 4px solid var(--border); border-bottom: 1px solid #f0ece4; display: flex; align-items: flex-start; gap: 8px; }
 .memo-item[data-tag="修理"] { border-left-color: var(--c-修理); }
@@ -102,10 +67,7 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
 .btn-sm { font-size: 10px; padding: 3px 7px; border: 1px solid var(--border); border-radius: 4px; background: transparent; cursor: pointer; color: var(--sub); font-family: inherit; }
 .memo-item.done .btn-sm:first-child { color: #27ae60; border-color: #27ae60; }
 .empty-memo { text-align: center; color: var(--sub); padding: 16px; font-size: 13px; }
-
-/* ===== 手書きモード ===== */
 .canvas-mode { display: none; flex-direction: column; flex: 1; overflow: hidden; }
-
 .canvas-toolbar { background: #fff; border-bottom: 1px solid var(--border); padding: 8px 12px; display: flex; align-items: center; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
 .color-btn { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
 .color-btn.active { border-color: #1e1e1e; transform: scale(1.15); }
@@ -115,32 +77,16 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
 .btn-eraser.active { background: #e8380d; color: #fff; }
 .btn-save-c { background: #1a5fa8; color: #fff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; margin-left: auto; }
 .btn-clear-c { padding: 4px 10px; border: 1.5px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--sub); }
-
-.canvas-wrap {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  touch-action: none;
-  background: #fffef8;
-  background-image:
-    linear-gradient(to right, #d8d4c8 1px, transparent 1px),
-    linear-gradient(to bottom, #d8d4c8 1px, transparent 1px);
-  background-size: 32px 32px;
-}
+.canvas-wrap { flex: 1; position: relative; overflow: hidden; touch-action: none; background: #fffef8; background-image: linear-gradient(to right, #d8d4c8 1px, transparent 1px), linear-gradient(to bottom, #d8d4c8 1px, transparent 1px); background-size: 32px 32px; }
 #drawCanvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; background: transparent; }
-
 .saved-bar { display: none; gap: 8px; overflow-x: auto; padding: 6px 12px; background: #fff; border-top: 1px solid var(--border); flex-shrink: 0; }
 .saved-bar.has-items { display: flex; }
 .saved-thumb-wrap { position: relative; flex-shrink: 0; }
 .saved-thumb { width: 60px; height: 45px; border-radius: 6px; border: 1.5px solid var(--border); object-fit: cover; cursor: pointer; display: block; }
 .btn-del-thumb { position: absolute; top: -4px; right: -4px; background: #e8380d; color: #fff; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-/* BOTTOM BAR */
 .bottom-bar { background: #fff; border-top: 1px solid var(--border); padding: 8px 14px; display: flex; gap: 8px; flex-shrink: 0; }
 .btn-line { flex: 1; padding: 10px; background: #06c755; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .btn-clear-done { padding: 10px 12px; background: var(--bg); color: var(--sub); border: 1.5px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
-
-/* CALENDAR POPUP */
 .cal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 300; align-items: flex-start; justify-content: center; padding-top: 60px; }
 .cal-overlay.open { display: flex; }
 .cal-popup { background: #fff; border-radius: 18px; width: calc(100% - 24px); max-width: 380px; padding: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); }
@@ -182,7 +128,6 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
   <div class="mode-tab" id="modeTabCanvas" onclick="switchMode('canvas')">✏️ 手書き</div>
 </div>
 
-<!-- テキストモード -->
 <div class="text-mode" id="textMode">
   <div class="tag-bar">
     <div class="tag-bar-left">
@@ -197,12 +142,9 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
     <button class="btn-add-top" onclick="addMemo()">＋ 追加</button>
     <button id="btnCancel" class="btn-add-top" onclick="cancelEdit()" style="display:none;background:#999">✕ キャンセル</button>
   </div>
-
   <div class="text-input-wrap">
     <textarea class="memo-textarea" id="memoInput" placeholder="ここに書く…"></textarea>
   </div>
-
-  <!-- テキストカラーバー -->
   <div class="color-bar">
     <span class="color-label">文字色</span>
     <div class="c-btn active" style="background:#1e1e1e" onclick="selectTextColor('#1e1e1e',this)"></div>
@@ -213,11 +155,9 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
     <div class="c-btn" style="background:#e91e8c" onclick="selectTextColor('#e91e8c',this)"></div>
     <div class="c-btn" style="background:#e67e22" onclick="selectTextColor('#e67e22',this)"></div>
   </div>
-
   <div class="memo-list-area" id="memoList"></div>
 </div>
 
-<!-- 手書きモード -->
 <div class="canvas-mode" id="canvasMode">
   <div class="canvas-toolbar">
     <div class="color-btn active" style="background:#1e1e1e" onclick="selectPenColor('#1e1e1e',this)"></div>
@@ -245,7 +185,6 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
   <button class="btn-line" id="lineBtn" onclick="shareToLine()">💬 LINEで共有</button>
 </div>
 
-<!-- カレンダーポップアップ -->
 <div class="cal-overlay" id="calOverlay" onclick="overlayClick(event)">
   <div class="cal-popup">
     <div class="cal-header">
@@ -288,12 +227,12 @@ let selectedDateStr = toDateStr(today);
 let selectedTag = '修理';
 let currentMode = 'text';
 let textColor = '#1e1e1e';
+let editingId = null;
 
 function toDateStr(d) {
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
-// MODE
 function switchMode(mode) {
   currentMode = mode;
   document.getElementById('modeTabText').classList.toggle('active', mode==='text');
@@ -301,10 +240,8 @@ function switchMode(mode) {
   document.getElementById('textMode').style.display = mode==='text' ? 'flex' : 'none';
   document.getElementById('canvasMode').style.display = mode==='canvas' ? 'flex' : 'none';
   if (mode==='canvas') initCanvas();
-  updateLineBtn();
 }
 
-// TEXT COLOR
 function selectTextColor(color, el) {
   textColor = color;
   document.querySelectorAll('.c-btn').forEach(b=>b.classList.remove('active'));
@@ -312,26 +249,21 @@ function selectTextColor(color, el) {
   document.getElementById('memoInput').style.color = color;
 }
 
-// TAG
 function selectTag(tag) {
   selectedTag = tag;
   document.querySelectorAll('.tag-btn').forEach(b=>b.classList.toggle('sel', b.dataset.tag===tag));
 }
 
-// ADD MEMO
 function addMemo() {
   const ta = document.getElementById('memoInput');
   const text = ta.value.trim();
   if (!text) return;
 
-  // 編集モードの場合
   if (editingId !== null) {
     const memos = allMemos[selectedDateStr]||[];
     const m = memos.find(m=>m.id===editingId);
     if (m) {
-      m.text = text;
-      m.tag = selectedTag;
-      m.color = textColor;
+      m.text = text; m.tag = selectedTag; m.color = textColor;
       saveMemos(); renderMemoList();
       sbUpdateMemo(m.id, {text: m.text, tag: m.tag, color: m.color});
     }
@@ -341,18 +273,17 @@ function addMemo() {
 
   if (!allMemos[selectedDateStr]) allMemos[selectedDateStr]=[];
   const now = new Date();
-  allMemos[selectedDateStr].push({
-    id:Date.now(), tag:selectedTag, text, done:false,
-    color: textColor,
-    time:now.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+' '+now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
-  });
+  const newMemo = {
+    id: Date.now(), tag: selectedTag, text, done: false, color: textColor,
+    time: now.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+' '+now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
+  };
+  allMemos[selectedDateStr].push(newMemo);
   saveMemos(); ta.value='';
-  renderMemoList(); updateLineBtn();
-  // Supabase保存
-  sbSaveMemo(allMemos[selectedDateStr][allMemos[selectedDateStr].length-1], selectedDateStr).then(newId => {
+  renderMemoList();
+  sbSaveMemo(newMemo, selectedDateStr).then(newId => {
     if (newId) {
-      allMemos[selectedDateStr][allMemos[selectedDateStr].length-1].id = newId;
-      saveMemos();
+      const idx = allMemos[selectedDateStr].findIndex(m=>m.id===newMemo.id);
+      if (idx !== -1) { allMemos[selectedDateStr][idx].id = newId; saveMemos(); }
     }
   });
 }
@@ -394,7 +325,7 @@ function deleteMemo(id) {
   if(!confirm('削除しますか？'))return;
   sbDeleteMemo(id);
   allMemos[selectedDateStr]=(allMemos[selectedDateStr]||[]).filter(m=>m.id!==id);
-  saveMemos();renderMemoList();updateLineBtn();
+  saveMemos();renderMemoList();
 }
 function clearDone() {
   const memos=allMemos[selectedDateStr]||[];
@@ -403,14 +334,6 @@ function clearDone() {
   if(!confirm(`完了済み${n}件を削除しますか？`))return;
   allMemos[selectedDateStr]=memos.filter(m=>!m.done);
   saveMemos();renderMemoList();
-}
-
-// LINE SHARE
-function updateLineBtn() {
-  const memos = allMemos[selectedDateStr]||[];
-  const canvases = allCanvases[selectedDateStr]||[];
-  const btn = document.getElementById('lineBtn');
-  btn.textContent = `💬 LINEで共有`;
 }
 function shareToLine() {
   const d=new Date(selectedDateStr+'T00:00:00');
@@ -422,19 +345,38 @@ function shareToLine() {
   memos.filter(m=>!m.done).forEach(m=>{const tag=getTag(m.tag);text+=`${tag.icon}[${m.tag}] ${m.text}\n`;});
   const done=memos.filter(m=>m.done);
   if(done.length>0){text+=`─────────────\n✅ 完了(${done.length}件)\n`;done.forEach(m=>{text+=`✓ ${m.text}\n`;});}
-  if(canvases.length>0)text+=`\n✏️ 手書きメモ: ${canvases.length}枚\n`;
   window.open('https://line.me/R/share?text='+encodeURIComponent(text),'_blank');
 }
+function editMemo(id) {
+  const memos = allMemos[selectedDateStr]||[];
+  const m = memos.find(m=>m.id===id);
+  if (!m) return;
+  selectTag(m.tag);
+  textColor = m.color || '#1e1e1e';
+  document.getElementById('memoInput').style.color = textColor;
+  const ta = document.getElementById('memoInput');
+  ta.value = m.text; ta.focus();
+  editingId = id;
+  document.querySelector('.btn-add-top').textContent = '✏️ 更新';
+  document.querySelector('.btn-add-top').style.background = '#8e44ad';
+  document.getElementById('btnCancel').style.display = '';
+}
+function cancelEdit() {
+  editingId = null;
+  document.getElementById('memoInput').value = '';
+  document.querySelector('.btn-add-top').textContent = '＋ 追加';
+  document.querySelector('.btn-add-top').style.background = '#1e1e1e';
+  document.getElementById('btnCancel').style.display = 'none';
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 
 // CANVAS
 let canvas, ctx, isDrawing=false, penColor='#1e1e1e', penSize=2, isEraser=false, lastX=0, lastY=0;
-
 function initCanvas() {
   canvas = document.getElementById('drawCanvas');
   const wrap = document.getElementById('canvasWrap');
-  canvas.width = wrap.clientWidth;
-  canvas.height = wrap.clientHeight;
-  if (ctx) return; // already initialized
+  canvas.width = wrap.clientWidth; canvas.height = wrap.clientHeight;
+  if (ctx) return;
   ctx = canvas.getContext('2d');
   canvas.addEventListener('pointerdown', startDraw);
   canvas.addEventListener('pointermove', draw);
@@ -442,87 +384,23 @@ function initCanvas() {
   canvas.addEventListener('pointercancel', endDraw);
   canvas.addEventListener('pointerleave', endDraw);
 }
-
-function getPos(e) {
-  const r=canvas.getBoundingClientRect();
-  return{x:(e.clientX-r.left)*(canvas.width/r.width),y:(e.clientY-r.top)*(canvas.height/r.height)};
-}
-function startDraw(e) {
-  e.preventDefault();isDrawing=true;
-  const p=getPos(e);lastX=p.x;lastY=p.y;
-  if(!isEraser){ctx.beginPath();ctx.arc(lastX,lastY,penSize/2,0,Math.PI*2);ctx.fillStyle=penColor;ctx.fill();}
-}
-function draw(e) {
-  if(!isDrawing)return;e.preventDefault();
-  const p=getPos(e);
-  if(isEraser){
-    ctx.globalCompositeOperation='destination-out';
-    ctx.beginPath();ctx.arc(p.x,p.y,penSize*3,0,Math.PI*2);ctx.fill();
-    ctx.globalCompositeOperation='source-over';
-  } else {
-    ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);
-    ctx.strokeStyle=penColor;ctx.lineWidth=penSize;
-    ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
-  }
-  lastX=p.x;lastY=p.y;
-}
+function getPos(e) { const r=canvas.getBoundingClientRect(); return{x:(e.clientX-r.left)*(canvas.width/r.width),y:(e.clientY-r.top)*(canvas.height/r.height)}; }
+function startDraw(e) { e.preventDefault();isDrawing=true; const p=getPos(e);lastX=p.x;lastY=p.y; if(!isEraser){ctx.beginPath();ctx.arc(lastX,lastY,penSize/2,0,Math.PI*2);ctx.fillStyle=penColor;ctx.fill();} }
+function draw(e) { if(!isDrawing)return;e.preventDefault(); const p=getPos(e); if(isEraser){ctx.globalCompositeOperation='destination-out';ctx.beginPath();ctx.arc(p.x,p.y,penSize*3,0,Math.PI*2);ctx.fill();ctx.globalCompositeOperation='source-over';}else{ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);ctx.strokeStyle=penColor;ctx.lineWidth=penSize;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();} lastX=p.x;lastY=p.y; }
 function endDraw(){isDrawing=false;}
-
-function selectPenColor(c,el) {
-  penColor=c;isEraser=false;
-  document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('eraserBtn').classList.remove('active');
-}
-function selectSize(s,el) {
-  penSize=s;
-  document.querySelectorAll('.pen-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-}
-function toggleEraser() {
-  isEraser=!isEraser;
-  document.getElementById('eraserBtn').classList.toggle('active',isEraser);
-}
-function clearCanvas() {
-  if(!confirm('全消去しますか？'))return;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-}
-function saveCanvas() {
-  const dataUrl=canvas.toDataURL('image/png');
-  if(!allCanvases[selectedDateStr])allCanvases[selectedDateStr]=[];
-  const now=new Date();
-  allCanvases[selectedDateStr].push({id:Date.now(),data:dataUrl,time:now.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+'  '+now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})});
-  saveCanvases();
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  renderSavedBar();alert('保存しました！');
-}
-function renderSavedBar() {
-  const bar=document.getElementById('savedBar');
-  const canvases=allCanvases[selectedDateStr]||[];
-  if(canvases.length===0){bar.classList.remove('has-items');bar.innerHTML='';return;}
-  bar.classList.add('has-items');
-  bar.innerHTML=canvases.map(c=>`
-    <div class="saved-thumb-wrap">
-      <img class="saved-thumb" src="${c.data}" title="${c.time}" />
-      <button class="btn-del-thumb" onclick="deleteCanvas(${c.id})">✕</button>
-    </div>`).join('');
-}
-function deleteCanvas(id) {
-  if(!confirm('削除しますか？'))return;
-  allCanvases[selectedDateStr]=(allCanvases[selectedDateStr]||[]).filter(c=>c.id!==id);
-  saveCanvases();renderSavedBar();
-}
+function selectPenColor(c,el){penColor=c;isEraser=false;document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');document.getElementById('eraserBtn').classList.remove('active');}
+function selectSize(s,el){penSize=s;document.querySelectorAll('.pen-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');}
+function toggleEraser(){isEraser=!isEraser;document.getElementById('eraserBtn').classList.toggle('active',isEraser);}
+function clearCanvas(){if(!confirm('全消去しますか？'))return;ctx.clearRect(0,0,canvas.width,canvas.height);}
+function saveCanvas(){const dataUrl=canvas.toDataURL('image/png');if(!allCanvases[selectedDateStr])allCanvases[selectedDateStr]=[];const now=new Date();allCanvases[selectedDateStr].push({id:Date.now(),data:dataUrl,time:now.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+'  '+now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})});saveCanvases();ctx.clearRect(0,0,canvas.width,canvas.height);renderSavedBar();alert('保存しました！');}
+function renderSavedBar(){const bar=document.getElementById('savedBar');const canvases=allCanvases[selectedDateStr]||[];if(canvases.length===0){bar.classList.remove('has-items');bar.innerHTML='';return;}bar.classList.add('has-items');bar.innerHTML=canvases.map(c=>`<div class="saved-thumb-wrap"><img class="saved-thumb" src="${c.data}" title="${c.time}" /><button class="btn-del-thumb" onclick="deleteCanvas(${c.id})">✕</button></div>`).join('');}
+function deleteCanvas(id){if(!confirm('削除しますか？'))return;allCanvases[selectedDateStr]=(allCanvases[selectedDateStr]||[]).filter(c=>c.id!==id);saveCanvases();renderSavedBar();}
 
 // CALENDAR
 function openCalendar(){renderCalendar();document.getElementById('calOverlay').classList.add('open');}
 function closeCalendar(){document.getElementById('calOverlay').classList.remove('open');}
 function overlayClick(e){if(e.target===document.getElementById('calOverlay'))closeCalendar();}
-function changeMonth(dir){
-  viewMonth+=dir;
-  if(viewMonth>11){viewMonth=0;viewYear++;}
-  if(viewMonth<0){viewMonth=11;viewYear--;}
-  renderCalendar();
-}
+function changeMonth(dir){viewMonth+=dir;if(viewMonth>11){viewMonth=0;viewYear++;}if(viewMonth<0){viewMonth=11;viewYear--;}renderCalendar();}
 function renderCalendar(){
   document.getElementById('calMonthLbl').textContent=viewYear+'年'+(viewMonth+1)+'月';
   const grid=document.getElementById('calGrid');
@@ -551,113 +429,55 @@ function selectDate(ds){
   if(currentMode==='canvas'&&ctx)ctx.clearRect(0,0,canvas.width,canvas.height);
 }
 
-let editingId = null;
-
-function editMemo(id) {
-  const memos = allMemos[selectedDateStr]||[];
-  const m = memos.find(m=>m.id===id);
-  if (!m) return;
-  // タグを合わせる
-  selectTag(m.tag);
-  // 文字色を合わせる
-  textColor = m.color || '#1e1e1e';
-  document.getElementById('memoInput').style.color = textColor;
-  document.querySelectorAll('.c-btn').forEach(b => {
-    b.classList.toggle('active', b.style.background === textColor);
-  });
-  // テキストを入力欄に呼び出す
-  const ta = document.getElementById('memoInput');
-  ta.value = m.text;
-  ta.focus();
-  editingId = id;
-  // 追加ボタンを「更新」に変更
-  document.querySelector('.btn-add-top').textContent = '✏️ 更新';
-  document.querySelector('.btn-add-top').style.background = '#8e44ad';
-  document.getElementById('btnCancel').style.display = '';
-  // 上にスクロール
-  document.querySelector('.text-input-wrap').scrollIntoView({behavior:'smooth'});
-}
-
-function cancelEdit() {
-  editingId = null;
-  document.getElementById('memoInput').value = '';
-  document.querySelector('.btn-add-top').textContent = '＋ 追加';
-  document.querySelector('.btn-add-top').style.background = '#1e1e1e';
-  document.getElementById('btnCancel').style.display = 'none';
-}
-function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
-
-
 // ========== SUPABASE ==========
 const SB_URL = 'https://kidxeqjovvakcqalblre.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZHhlcWpvdnZha2NxYWxibHJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzNjU3NzcsImV4cCI6MjA1Nzk0MTc3N30.IKyXBCKvMOFMYApvqhgUNBkCLMXfGKSxCiQyBNNvnRI';
 
-async function sbFetch(path, options={}) {
-  const res = await fetch(SB_URL + path, {
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': options.prefer || '',
-      ...options.headers
-    },
-    ...options
-  });
+async function sbFetch(path, method='GET', body=null, prefer=null) {
+  const headers = {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Content-Type': 'application/json',
+  };
+  if (prefer) headers['Prefer'] = prefer;
+  const options = { method, headers };
+  if (body) options.body = JSON.stringify(body);
+  const res = await fetch(SB_URL + path, options);
   return res;
 }
 
 async function sbLoadMemos(dateStr) {
   try {
     const res = await sbFetch(`/rest/v1/memo_entries?date_str=eq.${dateStr}&order=id.asc`);
-    if (!res.ok) return;
+    if (!res.ok) { console.error('sbLoadMemos', res.status, await res.text()); return; }
     const rows = await res.json();
     allMemos[dateStr] = rows.map(r => ({
-      id: r.id,
-      tag: r.tag,
-      text: r.text,
-      done: r.done,
-      color: r.color || '#1e1e1e',
-      time: r.memo_time
+      id: r.id, tag: r.tag, text: r.text, done: r.done,
+      color: r.color || '#1e1e1e', time: r.memo_time
     }));
+    saveMemos();
     renderMemoList();
-  } catch(e) { console.error('load error', e); }
+  } catch(e) { console.error('sbLoadMemos error', e); }
 }
 
 async function sbSaveMemo(memo, dateStr) {
   try {
-    const res = await sbFetch('/rest/v1/memo_entries', {
-      method: 'POST',
-      prefer: 'return=representation',
-      body: JSON.stringify({
-        date_str: dateStr,
-        tag: memo.tag,
-        text: memo.text,
-        done: memo.done,
-        color: memo.color,
-        memo_time: memo.time
-      })
-    });
-    if (!res.ok) return null;
+    const res = await sbFetch('/rest/v1/memo_entries', 'POST', {
+      date_str: dateStr, tag: memo.tag, text: memo.text,
+      done: memo.done, color: memo.color, memo_time: memo.time
+    }, 'return=representation');
+    if (!res.ok) { console.error('sbSaveMemo', res.status, await res.text()); return null; }
     const rows = await res.json();
     return rows[0]?.id || null;
-  } catch(e) { return null; }
+  } catch(e) { console.error('sbSaveMemo error', e); return null; }
 }
 
 async function sbUpdateMemo(id, fields) {
-  try {
-    await sbFetch(`/rest/v1/memo_entries?id=eq.${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(fields)
-    });
-  } catch(e) {}
+  try { await sbFetch(`/rest/v1/memo_entries?id=eq.${id}`, 'PATCH', fields); } catch(e) {}
 }
 
 async function sbDeleteMemo(id) {
-  try {
-    await sbFetch(`/rest/v1/memo_entries?id=eq.${id}`, {
-      method: 'DELETE'
-    });
-  } catch(e) {}
+  try { await sbFetch(`/rest/v1/memo_entries?id=eq.${id}`, 'DELETE'); } catch(e) {}
 }
 
 // INIT
