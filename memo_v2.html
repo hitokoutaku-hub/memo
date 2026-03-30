@@ -25,8 +25,8 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; }
-body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; display: flex; flex-direction: column; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', sans-serif; display: flex; flex-direction: column; overflow: hidden; }
 
 /* HEADER */
 .header {
@@ -65,6 +65,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans JP', s
 .calendar-panel {
   background: var(--card); flex-shrink: 0;
   padding: 4px 8px 6px; border-bottom: 1px solid var(--border);
+  max-height: 260px;
 }
 .weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 1px; }
 .weekday { text-align: center; font-size: 9px; font-weight: 700; color: var(--sub); padding: 2px 0; }
