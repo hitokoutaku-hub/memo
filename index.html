@@ -195,6 +195,7 @@ html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: 
       <button class="tag-btn" data-tag="重要メモ" onclick="selectTag('重要メモ')">⭐ 重要</button>
     </div>
     <button class="btn-add-top" onclick="addMemo()">＋ 追加</button>
+    <button id="btnCancel" class="btn-add-top" onclick="cancelEdit()" style="display:none;background:#999">✕ キャンセル</button>
   </div>
 
   <div class="text-input-wrap">
@@ -322,12 +323,28 @@ function addMemo() {
   const ta = document.getElementById('memoInput');
   const text = ta.value.trim();
   if (!text) return;
+
+  // 編集モードの場合
+  if (editingId !== null) {
+    const memos = allMemos[selectedDateStr]||[];
+    const m = memos.find(m=>m.id===editingId);
+    if (m) {
+      m.text = text;
+      m.tag = selectedTag;
+      m.color = textColor;
+      saveMemos(); renderMemoList();
+      sbUpdateMemo(m.id, {text: m.text, tag: m.tag, color: m.color});
+    }
+    cancelEdit();
+    return;
+  }
+
   if (!allMemos[selectedDateStr]) allMemos[selectedDateStr]=[];
   const now = new Date();
   allMemos[selectedDateStr].push({
     id:Date.now(), tag:selectedTag, text, done:false,
     color: textColor,
-    time:now.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+'  '+now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
+    time:now.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+' '+now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
   });
   saveMemos(); ta.value='';
   renderMemoList(); updateLineBtn();
@@ -534,15 +551,39 @@ function selectDate(ds){
   if(currentMode==='canvas'&&ctx)ctx.clearRect(0,0,canvas.width,canvas.height);
 }
 
+let editingId = null;
+
 function editMemo(id) {
   const memos = allMemos[selectedDateStr]||[];
   const m = memos.find(m=>m.id===id);
   if (!m) return;
-  const newText = prompt('メモを編集', m.text);
-  if (newText === null) return;
-  m.text = newText.trim();
-  saveMemos(); renderMemoList();
-  sbUpdateMemo(m.id, {text: m.text});
+  // タグを合わせる
+  selectTag(m.tag);
+  // 文字色を合わせる
+  textColor = m.color || '#1e1e1e';
+  document.getElementById('memoInput').style.color = textColor;
+  document.querySelectorAll('.c-btn').forEach(b => {
+    b.classList.toggle('active', b.style.background === textColor);
+  });
+  // テキストを入力欄に呼び出す
+  const ta = document.getElementById('memoInput');
+  ta.value = m.text;
+  ta.focus();
+  editingId = id;
+  // 追加ボタンを「更新」に変更
+  document.querySelector('.btn-add-top').textContent = '✏️ 更新';
+  document.querySelector('.btn-add-top').style.background = '#8e44ad';
+  document.getElementById('btnCancel').style.display = '';
+  // 上にスクロール
+  document.querySelector('.text-input-wrap').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelEdit() {
+  editingId = null;
+  document.getElementById('memoInput').value = '';
+  document.querySelector('.btn-add-top').textContent = '＋ 追加';
+  document.querySelector('.btn-add-top').style.background = '#1e1e1e';
+  document.getElementById('btnCancel').style.display = 'none';
 }
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
 
