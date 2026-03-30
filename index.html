@@ -331,6 +331,13 @@ function addMemo() {
   });
   saveMemos(); ta.value='';
   renderMemoList(); updateLineBtn();
+  // Supabase保存
+  sbSaveMemo(allMemos[selectedDateStr][allMemos[selectedDateStr].length-1], selectedDateStr).then(newId => {
+    if (newId) {
+      allMemos[selectedDateStr][allMemos[selectedDateStr].length-1].id = newId;
+      saveMemos();
+    }
+  });
 }
 
 document.getElementById('memoInput').addEventListener('keydown', e=>{
@@ -364,10 +371,11 @@ function renderMemoList() {
 
 function toggleDone(id) {
   const m=(allMemos[selectedDateStr]||[]).find(m=>m.id===id);
-  if(m){m.done=!m.done;saveMemos();renderMemoList();}
+  if(m){m.done=!m.done;saveMemos();renderMemoList();sbUpdateMemo(m.id,{done:m.done});}
 }
 function deleteMemo(id) {
   if(!confirm('削除しますか？'))return;
+  sbDeleteMemo(id);
   allMemos[selectedDateStr]=(allMemos[selectedDateStr]||[]).filter(m=>m.id!==id);
   saveMemos();renderMemoList();updateLineBtn();
 }
@@ -522,6 +530,7 @@ function selectDate(ds){
   const d=new Date(ds+'T00:00:00');
   document.getElementById('headerDate').textContent=d.toLocaleDateString('ja-JP',{month:'short',day:'numeric',weekday:'short'});
   renderMemoList();renderSavedBar();renderCalendar();
+  sbLoadMemos(selectedDateStr);
   if(currentMode==='canvas'&&ctx)ctx.clearRect(0,0,canvas.width,canvas.height);
 }
 
@@ -533,13 +542,88 @@ function editMemo(id) {
   if (newText === null) return;
   m.text = newText.trim();
   saveMemos(); renderMemoList();
+  sbUpdateMemo(m.id, {text: m.text});
 }
 function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+
+
+// ========== SUPABASE ==========
+const SB_URL = 'https://kidxeqjovvakcqalblre.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtpZHhlcWpvdnZha2NxYWxibHJlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDIzNjU3NzcsImV4cCI6MjA1Nzk0MTc3N30.IKyXBCKvMOFMYApvqhgUNBkCLMXfGKSxCiQyBNNvnRI';
+
+async function sbFetch(path, options={}) {
+  const res = await fetch(SB_URL + path, {
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || '',
+      ...options.headers
+    },
+    ...options
+  });
+  return res;
+}
+
+async function sbLoadMemos(dateStr) {
+  try {
+    const res = await sbFetch(`/rest/v1/memo_entries?date_str=eq.${dateStr}&order=id.asc`);
+    if (!res.ok) return;
+    const rows = await res.json();
+    allMemos[dateStr] = rows.map(r => ({
+      id: r.id,
+      tag: r.tag,
+      text: r.text,
+      done: r.done,
+      color: r.color || '#1e1e1e',
+      time: r.memo_time
+    }));
+    renderMemoList();
+  } catch(e) { console.error('load error', e); }
+}
+
+async function sbSaveMemo(memo, dateStr) {
+  try {
+    const res = await sbFetch('/rest/v1/memo_entries', {
+      method: 'POST',
+      prefer: 'return=representation',
+      body: JSON.stringify({
+        date_str: dateStr,
+        tag: memo.tag,
+        text: memo.text,
+        done: memo.done,
+        color: memo.color,
+        memo_time: memo.time
+      })
+    });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return rows[0]?.id || null;
+  } catch(e) { return null; }
+}
+
+async function sbUpdateMemo(id, fields) {
+  try {
+    await sbFetch(`/rest/v1/memo_entries?id=eq.${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(fields)
+    });
+  } catch(e) {}
+}
+
+async function sbDeleteMemo(id) {
+  try {
+    await sbFetch(`/rest/v1/memo_entries?id=eq.${id}`, {
+      method: 'DELETE'
+    });
+  } catch(e) {}
+}
 
 // INIT
 const d=new Date(selectedDateStr+'T00:00:00');
 document.getElementById('headerDate').textContent=d.toLocaleDateString('ja-JP',{month:'short',day:'numeric',weekday:'short'});
 renderMemoList();renderCalendar();
+sbLoadMemos(selectedDateStr);
 </script>
 </body>
 </html>
