@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>作業メモ</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+:root {
+  --bg: #f2f0eb; --card: #fff; --text: #1e1e1e; --sub: #999; --border: #e0dbd0;
+  --c-修理: #1a5fa8; --c-車検: #e67e22; --c-打合: #8e44ad;
+  --c-家族: #e91e8c; --c-電話: #e8380d; --c-メモ: #607d8b; --c-重要: #e6b800;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); }
+body { display: flex; flex-direction: column; }
+
+.header { background: #1e1e1e; color: #fff; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header h1 { font-size: 16px; font-weight: 900; }
+.header-date { font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 700; }
+.btn-cal-icon { background: rgba(255,255,255,0.15); border: none; color: #fff; font-size: 20px; width: 38px; height: 38px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+.view-tabs { display: flex; background: #fff; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.view-tab { flex: 1; padding: 8px; text-align: center; font-size: 12px; font-weight: 700; color: var(--sub); cursor: pointer; border-bottom: 2px solid transparent; }
+.view-tab.active { color: #1e1e1e; border-bottom-color: #1e1e1e; }
+
+.main { flex: 1; overflow-y: auto; padding: 12px 14px 90px; }
+.list-view { display: none; flex: 1; overflow-y: auto; padding: 12px 14px 90px; }
+
+.day-label { font-size: 15px; font-weight: 900; color: #1e1e1e; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+
+.input-tab-row { display: flex; margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1.5px solid var(--border); }
+.input-tab-btn { flex: 1; padding: 8px; border: none; background: var(--bg); font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--sub); }
+.input-tab-btn.active { background: #1e1e1e; color: #fff; }
+
+.tag-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.tag-btn { padding: 5px 10px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--sub); white-space: nowrap; }
+.tag-btn.sel { color: #fff; border-color: transparent; }
+.tag-btn[data-tag="修理"].sel { background: var(--c-修理); }
+.tag-btn[data-tag="車検"].sel { background: var(--c-車検); }
+.tag-btn[data-tag="打ち合わせ"].sel { background: var(--c-打合); }
+.tag-btn[data-tag="家族"].sel { background: var(--c-家族); }
+.tag-btn[data-tag="電話"].sel { background: var(--c-電話); }
+.tag-btn[data-tag="メモ"].sel { background: var(--c-メモ); }
+.tag-btn[data-tag="重要メモ"].sel { background: var(--c-重要); color: #333; }
+
+.memo-input-wrap { display: flex; gap: 6px; margin-bottom: 10px; }
+.memo-textarea { flex: 1; border: 1.5px solid var(--border); border-radius: 8px; padding: 9px 11px; font-size: 15px; font-family: inherit; color: var(--text); outline: none; line-height: 1.7; resize: none; min-height: 60px; background: #fafaf8; }
+.memo-textarea:focus { border-color: #1e1e1e; }
+.btn-add { background: #1e1e1e; color: #fff; border: none; border-radius: 8px; padding: 0 14px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; align-self: flex-end; height: 42px; }
+
+.memo-item { background: var(--card); border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; border-left: 4px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.memo-item.done { opacity: 0.45; }
+.memo-item[data-tag="修理"] { border-left-color: var(--c-修理); }
+.memo-item[data-tag="車検"] { border-left-color: var(--c-車検); }
+.memo-item[data-tag="打ち合わせ"] { border-left-color: var(--c-打合); }
+.memo-item[data-tag="家族"] { border-left-color: var(--c-家族); background: linear-gradient(135deg,#fff 0%,#fff0f8 100%); border-left-width: 6px; }
+.memo-item[data-tag="電話"] { border-left-color: var(--c-電話); }
+.memo-item[data-tag="メモ"] { border-left-color: var(--c-メモ); }
+.memo-item[data-tag="重要メモ"] { border-left-color: var(--c-重要); background: linear-gradient(135deg,#fff 0%,#fffde0 100%); }
+.memo-top { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
+.tag-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; color: #fff; }
+.tag-badge[data-tag="修理"] { background: var(--c-修理); }
+.tag-badge[data-tag="車検"] { background: var(--c-車検); }
+.tag-badge[data-tag="打ち合わせ"] { background: var(--c-打合); }
+.tag-badge[data-tag="家族"] { background: var(--c-家族); }
+.tag-badge[data-tag="電話"] { background: var(--c-電話); }
+.tag-badge[data-tag="メモ"] { background: var(--c-メモ); }
+.tag-badge[data-tag="重要メモ"] { background: var(--c-重要); color: #333; }
+.memo-time { font-size: 10px; color: var(--sub); margin-left: auto; }
+.memo-text { font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+.memo-item.done .memo-text { text-decoration: line-through; color: #bbb; }
+.memo-actions { display: flex; gap: 5px; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border); }
+.btn-check { font-size: 11px; font-weight: 700; padding: 4px 10px; border: 1.5px solid var(--border); border-radius: 5px; background: transparent; cursor: pointer; font-family: inherit; color: var(--sub); }
+.memo-item.done .btn-check { color: #27ae60; border-color: #27ae60; }
+.btn-del { font-size: 11px; font-weight: 700; padding: 4px 10px; border: 1.5px solid var(--border); border-radius: 5px; background: transparent; cursor: pointer; font-family: inherit; color: var(--sub); margin-left: auto; }
+
+.canvas-area { display: none; }
+.canvas-area.active { display: block; }
+.text-area { display: none; }
+.text-area.active { display: block; }
+.canvas-toolbar { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+.color-btn { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+.color-btn.active { border-color: #1e1e1e; }
+.pen-size-btn { padding: 3px 8px; border: 1.5px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--sub); }
+.pen-size-btn.active { background: #1e1e1e; color: #fff; }
+.btn-eraser { padding: 3px 8px; border: 1.5px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--sub); }
+.btn-eraser.active { background: #e8380d; color: #fff; }
+.btn-clear-canvas { padding: 3px 8px; border: 1.5px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--sub); margin-left: auto; }
+.btn-save-canvas { padding: 3px 10px; border: none; border-radius: 6px; background: #1e1e1e; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; color: #fff; }
+.canvas-wrap { background: #fff; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; touch-action: none; }
+canvas { display: block; width: 100%; cursor: crosshair; }
+.saved-canvas-item { background: var(--card); border-radius: 8px; padding: 8px; margin-bottom: 8px; margin-top: 10px; border: 1.5px solid var(--border); }
+.saved-canvas-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.saved-canvas-time { font-size: 11px; color: var(--sub); font-weight: 700; }
+.btn-del-canvas { font-size: 11px; font-weight: 700; padding: 3px 8px; border: 1.5px solid var(--border); border-radius: 5px; background: transparent; cursor: pointer; color: var(--sub); }
+.saved-canvas-img { width: 100%; border-radius: 6px; }
+
+.list-day-group { margin-bottom: 14px; }
+.list-day-header { font-size: 13px; font-weight: 900; color: #1e1e1e; margin-bottom: 5px; padding-bottom: 4px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.list-day-header.has-family { color: var(--c-家族); }
+.list-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--card); border-radius: 8px; margin-bottom: 4px; border-left: 4px solid var(--border); cursor: pointer; }
+.list-item[data-tag="修理"] { border-left-color: var(--c-修理); }
+.list-item[data-tag="車検"] { border-left-color: var(--c-車検); }
+.list-item[data-tag="打ち合わせ"] { border-left-color: var(--c-打合); }
+.list-item[data-tag="家族"] { border-left-color: var(--c-家族); background: linear-gradient(135deg,#fff 0%,#fff0f8 100%); border-left-width: 6px; }
+.list-item[data-tag="電話"] { border-left-color: var(--c-電話); }
+.list-item[data-tag="メモ"] { border-left-color: var(--c-メモ); }
+.list-item[data-tag="重要メモ"] { border-left-color: var(--c-重要); background: linear-gradient(135deg,#fff 0%,#fffde0 100%); }
+.list-icon { font-size: 15px; flex-shrink: 0; }
+.list-text { font-size: 13px; flex: 1; line-height: 1.4; }
+.list-time { font-size: 10px; color: var(--sub); flex-shrink: 0; }
+.empty-list { text-align: center; color: var(--sub); padding: 40px; font-size: 13px; }
+
+/* カレンダーポップアップ */
+.cal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 300; align-items: flex-start; justify-content: center; padding-top: 60px; }
+.cal-overlay.open { display: flex; }
+.cal-popup { background: #fff; border-radius: 18px; width: calc(100% - 24px); max-width: 380px; padding: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); }
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cal-nav { display: flex; align-items: center; gap: 8px; }
+.cal-nav-btn { background: var(--bg); border: none; font-size: 18px; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.cal-month { font-size: 16px; font-weight: 900; min-width: 80px; text-align: center; }
+.btn-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--sub); line-height: 1; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 4px; }
+.cal-weekday { text-align: center; font-size: 11px; font-weight: 700; color: var(--sub); padding: 2px 0; }
+.cal-weekday:first-child { color: #c0392b; }
+.cal-weekday:last-child { color: #1a5fa8; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+.cal-day { aspect-ratio: 1; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: background 0.1s; }
+.cal-day:hover { background: var(--bg); }
+.cal-day-num { font-size: 14px; font-weight: 700; line-height: 1; }
+.cal-day.today .cal-day-num { background: #1e1e1e; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.cal-day.selected .cal-day-num { background: #e91e8c; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.cal-day.sun .cal-day-num { color: #c0392b; }
+.cal-day.sat .cal-day-num { color: #1a5fa8; }
+.cal-day.today .cal-day-num, .cal-day.selected .cal-day-num { color: #fff !important; }
+.cal-dots { display: flex; gap: 2px; margin-top: 2px; justify-content: center; }
+.cal-dot { width: 5px; height: 5px; border-radius: 50%; }
+.cal-dot.family { width: 7px; height: 7px; }
+
+.bottom-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--border); padding: 8px 14px; display: flex; gap: 8px; z-index: 100; }
+.btn-line { flex: 1; padding: 10px; background: #06c755; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn-clear { padding: 10px 12px; background: var(--bg); color: var(--sub); border: 1.5px solid var(--border); border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.empty-memo { text-align: center; color: var(--sub); padding: 30px; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>📓 作業メモ</h1>
+    <span class="header-date" id="headerDate"></span>
+  </div>
+  <button class="btn-cal-icon" onclick="openCalendar()">📅</button>
+</div>
+
+<div class="view-tabs">
+  <div class="view-tab active" id="viewTabMemo" onclick="switchView('memo')">📝 メモ</div>
+  <div class="view-tab" id="viewTabList" onclick="switchView('list')">📋 一覧</div>
+</div>
+
+<div class="main" id="memoView">
+  <div class="day-label" id="dayLabel"></div>
+  <div class="input-tab-row">
+    <button class="input-tab-btn active" id="inputTabText" onclick="switchInputTab('text')">📝 テキスト</button>
+    <button class="input-tab-btn" id="inputTabCanvas" onclick="switchInputTab('canvas')">✏️ 手書き</button>
+  </div>
+  <div class="text-area active" id="textArea">
+    <div class="tag-row">
+      <button class="tag-btn sel" data-tag="修理" onclick="selectTag('修理')">🔧 修理</button>
+      <button class="tag-btn" data-tag="車検" onclick="selectTag('車検')">🔍 車検</button>
+      <button class="tag-btn" data-tag="打ち合わせ" onclick="selectTag('打ち合わせ')">🤝 打合</button>
+      <button class="tag-btn" data-tag="家族" onclick="selectTag('家族')">👨‍👩‍👧 家族</button>
+      <button class="tag-btn" data-tag="電話" onclick="selectTag('電話')">📞 電話</button>
+      <button class="tag-btn" data-tag="メモ" onclick="selectTag('メモ')">📌 メモ</button>
+      <button class="tag-btn" data-tag="重要メモ" onclick="selectTag('重要メモ')">⭐ 重要</button>
+    </div>
+    <div class="memo-input-wrap">
+      <textarea class="memo-textarea" id="memoInput" placeholder="ここにメモを書く…&#10;Enterで書き込み" rows="2"></textarea>
+      <button class="btn-add" onclick="addMemo()">追加</button>
+    </div>
+    <div id="memoList"></div>
+  </div>
+  <div class="canvas-area" id="canvasArea">
+    <div class="canvas-toolbar">
+      <div class="color-btn active" style="background:#1e1e1e" onclick="selectColor('#1e1e1e',this)"></div>
+      <div class="color-btn" style="background:#e8380d" onclick="selectColor('#e8380d',this)"></div>
+      <div class="color-btn" style="background:#1a5fa8" onclick="selectColor('#1a5fa8',this)"></div>
+      <div class="color-btn" style="background:#27ae60" onclick="selectColor('#27ae60',this)"></div>
+      <div class="color-btn" style="background:#e91e8c" onclick="selectColor('#e91e8c',this)"></div>
+      <button class="pen-size-btn active" data-size="2" onclick="selectSize(2,this)">細</button>
+      <button class="pen-size-btn" data-size="5" onclick="selectSize(5,this)">中</button>
+      <button class="pen-size-btn" data-size="10" onclick="selectSize(10,this)">太</button>
+      <button class="btn-eraser" id="eraserBtn" onclick="toggleEraser()">消しゴム</button>
+      <button class="btn-clear-canvas" onclick="clearCanvas()">全消去</button>
+      <button class="btn-save-canvas" onclick="saveCanvas()">💾 保存</button>
+    </div>
+    <div class="canvas-wrap"><canvas id="drawCanvas"></canvas></div>
+    <div id="savedCanvasList"></div>
+  </div>
+</div>
+
+<div class="list-view" id="listView">
+  <div style="font-size:16px;font-weight:900;margin-bottom:12px" id="listMonthLabel"></div>
+  <div id="monthListContent"></div>
+</div>
+
+<!-- カレンダーポップアップ -->
+<div class="cal-overlay" id="calOverlay" onclick="overlayClick(event)">
+  <div class="cal-popup">
+    <div class="cal-header">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+        <span class="cal-month" id="calMonth"></span>
+        <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+      </div>
+      <button class="btn-close" onclick="closeCalendar()">✕</button>
+    </div>
+    <div class="cal-weekdays">
+      <div class="cal-weekday">日</div><div class="cal-weekday">月</div><div class="cal-weekday">火</div>
+      <div class="cal-weekday">水</div><div class="cal-weekday">木</div><div class="cal-weekday">金</div>
+      <div class="cal-weekday">土</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+</div>
+
+<div class="bottom-bar">
+  <button class="btn-clear" onclick="clearDone()">完了を削除</button>
+  <button class="btn-line" onclick="shareToLine()">💬 LINEで共有</button>
+</div>
+
+<script>
+let allMemos = JSON.parse(localStorage.getItem('cal_memos_v3') || '{}');
+let allCanvases = JSON.parse(localStorage.getItem('cal_canvases_v2') || '{}');
+function saveMemos() { localStorage.setItem('cal_memos_v3', JSON.stringify(allMemos)); }
+function saveCanvases() { localStorage.setItem('cal_canvases_v2', JSON.stringify(allCanvases)); }
+
+const TAGS = [
+  {name:'修理', icon:'🔧', color:'#1a5fa8'},
+  {name:'車検', icon:'🔍', color:'#e67e22'},
+  {name:'打ち合わせ', icon:'🤝', color:'#8e44ad'},
+  {name:'家族', icon:'👨‍👩‍👧', color:'#e91e8c', big:true},
+  {name:'電話', icon:'📞', color:'#e8380d'},
+  {name:'メモ', icon:'📌', color:'#607d8b'},
+  {name:'重要メモ', icon:'⭐', color:'#e6b800'},
+];
+function getTag(name) { return TAGS.find(t=>t.name===name)||{name,icon:'📝',color:'#888'}; }
+
+const today = new Date();
+let viewYear = today.getFullYear();
+let viewMonth = today.getMonth();
+let selectedDateStr = toDateStr(today);
+let selectedTag = '修理';
+let currentView = 'memo';
+let currentInputTab = 'text';
+
+function toDateStr(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function openCalendar() {
+  renderCalendar();
+  document.getElementById('calOverlay').classList.add('open');
+}
+function closeCalendar() {
+  document.getElementById('calOverlay').classList.remove('open');
+}
+function overlayClick(e) {
+  if (e.target===document.getElementById('calOverlay')) closeCalendar();
+}
+
+function changeMonth(dir) {
+  viewMonth += dir;
+  if (viewMonth>11){viewMonth=0;viewYear++;}
+  if (viewMonth<0){viewMonth=11;viewYear--;}
+  renderCalendar();
+  if (currentView==='list') renderMonthList();
+}
+
+function renderCalendar() {
+  document.getElementById('calMonth').textContent = viewYear+'年'+(viewMonth+1)+'月';
+  const grid = document.getElementById('calGrid');
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+  let html = '';
+  for (let i=0;i<firstDay;i++) html+='<div class="cal-day empty"></div>';
+  for (let d=1;d<=daysInMonth;d++) {
+    const ds = viewYear+'-'+String(viewMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const dow = new Date(viewYear,viewMonth,d).getDay();
+    const isToday = ds===toDateStr(today);
+    const isSel = ds===selectedDateStr;
+    const memos = allMemos[ds]||[];
+    const hasCanvas = (allCanvases[ds]||[]).length>0;
+    let cls = 'cal-day'+(dow===0?' sun':'')+(dow===6?' sat':'')+(isToday&&!isSel?' today':'')+(isSel?' selected':'');
+    const dots = memos.slice(0,4).map(m=>{
+      const tag=getTag(m.tag);
+      return `<div class="cal-dot${tag.big?' family':''}" style="background:${tag.color}"></div>`;
+    }).join('')+(hasCanvas?'<div class="cal-dot" style="background:#888"></div>':'');
+    html+=`<div class="${cls}" onclick="selectDate('${ds}')">
+      <span class="cal-day-num">${d}</span>
+      ${(memos.length>0||hasCanvas)?`<div class="cal-dots">${dots}</div>`:''}
+    </div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function selectDate(ds) {
+  selectedDateStr = ds;
+  closeCalendar();
+  renderDetail();
+  if (currentView==='list') switchView('memo');
+}
+
+function switchView(v) {
+  currentView = v;
+  document.getElementById('viewTabMemo').classList.toggle('active', v==='memo');
+  document.getElementById('viewTabList').classList.toggle('active', v==='list');
+  document.getElementById('memoView').style.display = v==='memo' ? '' : 'none';
+  document.getElementById('listView').style.display = v==='list' ? 'block' : 'none';
+  if (v==='list') renderMonthList();
+}
+
+function renderDetail() {
+  const d = new Date(selectedDateStr+'T00:00:00');
+  document.getElementById('dayLabel').textContent =
+    d.toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'long'});
+  document.getElementById('headerDate').textContent =
+    d.toLocaleDateString('ja-JP',{month:'short',day:'numeric',weekday:'short'});
+  renderMemoList();
+  if (currentInputTab==='canvas') loadCanvasImages();
+}
+
+function switchInputTab(tab) {
+  currentInputTab = tab;
+  document.getElementById('inputTabText').classList.toggle('active', tab==='text');
+  document.getElementById('inputTabCanvas').classList.toggle('active', tab==='canvas');
+  document.getElementById('textArea').classList.toggle('active', tab==='text');
+  document.getElementById('canvasArea').classList.toggle('active', tab==='canvas');
+  if (tab==='canvas') { initCanvas(); loadCanvasImages(); }
+}
+
+function selectTag(tag) {
+  selectedTag = tag;
+  document.querySelectorAll('.tag-btn').forEach(b=>b.classList.toggle('sel', b.dataset.tag===tag));
+}
+
+document.getElementById('memoInput').addEventListener('keydown', e=>{
+  if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();addMemo();}
+});
+
+function addMemo() {
+  const ta = document.getElementById('memoInput');
+  const text = ta.value.trim();
+  if (!text) return;
+  if (!allMemos[selectedDateStr]) allMemos[selectedDateStr]=[];
+  const now = new Date();
+  allMemos[selectedDateStr].push({
+    id:Date.now(), tag:selectedTag, text, done:false,
+    time:now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
+  });
+  saveMemos(); ta.value='';
+  renderMemoList();
+}
+
+function renderMemoList() {
+  const list = document.getElementById('memoList');
+  const memos = allMemos[selectedDateStr]||[];
+  const pending = memos.filter(m=>!m.done);
+  const done = memos.filter(m=>m.done);
+  const sorted = [...pending,...done];
+  if (sorted.length===0) {
+    list.innerHTML='<div class="empty-memo">まだメモはありません</div>';
+    return;
+  }
+  list.innerHTML = sorted.map(m=>{
+    const tag=getTag(m.tag);
+    return `<div class="memo-item ${m.done?'done':''}" data-tag="${m.tag}">
+      <div class="memo-top">
+        <span class="tag-badge" data-tag="${m.tag}">${tag.icon} ${m.tag}</span>
+        ${m.done?'<span style="font-size:10px;color:#bbb;font-weight:700">完了</span>':''}
+        <span class="memo-time">${m.time}</span>
+      </div>
+      <div class="memo-text">${escHtml(m.text)}</div>
+      <div class="memo-actions">
+        <button class="btn-check" onclick="toggleDone(${m.id})">${m.done?'↩ 戻す':'✓ 完了'}</button>
+        <button class="btn-del" onclick="deleteMemo(${m.id})">削除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleDone(id) {
+  const memos = allMemos[selectedDateStr]||[];
+  const m = memos.find(m=>m.id===id);
+  if (m){m.done=!m.done;saveMemos();renderMemoList();}
+}
+
+function deleteMemo(id) {
+  if (!confirm('削除しますか？')) return;
+  allMemos[selectedDateStr]=(allMemos[selectedDateStr]||[]).filter(m=>m.id!==id);
+  saveMemos();renderMemoList();
+}
+
+function clearDone() {
+  const memos = allMemos[selectedDateStr]||[];
+  const doneCount = memos.filter(m=>m.done).length;
+  if (doneCount===0){alert('完了済みのメモはありません');return;}
+  if (!confirm(`完了済み${doneCount}件を削除しますか？`)) return;
+  allMemos[selectedDateStr]=memos.filter(m=>!m.done);
+  saveMemos();renderMemoList();
+}
+
+function renderMonthList() {
+  document.getElementById('listMonthLabel').textContent = viewYear+'年'+(viewMonth+1)+'月の予定';
+  const content = document.getElementById('monthListContent');
+  const daysInMonth = new Date(viewYear, viewMonth+1, 0).getDate();
+  let html=''; let hasAny=false;
+  for (let d=1;d<=daysInMonth;d++) {
+    const ds = viewYear+'-'+String(viewMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const memos = (allMemos[ds]||[]).filter(m=>!m.done);
+    const canvases = allCanvases[ds]||[];
+    if (memos.length===0&&canvases.length===0) continue;
+    hasAny=true;
+    const date = new Date(ds+'T00:00:00');
+    const dow = ['日','月','火','水','木','金','土'][date.getDay()];
+    const isWeekend = date.getDay()===0||date.getDay()===6;
+    const hasFamily = memos.some(m=>m.tag==='家族');
+    html+=`<div class="list-day-group">
+      <div class="list-day-header ${hasFamily?'has-family':''}" onclick="selectDate('${ds}')">
+        <span style="font-size:14px;font-weight:900;color:${isWeekend?(date.getDay()===0?'#c0392b':'#1a5fa8'):'#1e1e1e'}">${d}日（${dow}）</span>
+        <span style="font-size:11px;color:var(--sub)">${memos.length}件</span>
+        ${hasFamily?'<span style="font-size:12px">👨‍👩‍👧 家族予定あり</span>':''}
+      </div>`;
+    memos.forEach(m=>{
+      const tag=getTag(m.tag);
+      html+=`<div class="list-item" data-tag="${m.tag}" onclick="selectDate('${ds}')">
+        <span class="list-icon">${tag.icon}</span>
+        <span class="list-text">${escHtml(m.text)}</span>
+        <span class="list-time">${m.time}</span>
+      </div>`;
+    });
+    if (canvases.length>0) {
+      html+=`<div class="list-item" data-tag="メモ" onclick="selectDate('${ds}')">
+        <span class="list-icon">✏️</span>
+        <span class="list-text">手書きメモ ${canvases.length}件</span>
+      </div>`;
+    }
+    html+='</div>';
+  }
+  if (!hasAny) html='<div class="empty-list">この月の予定はありません</div>';
+  content.innerHTML=html;
+}
+
+let canvas,ctx,isDrawing=false,penColor='#1e1e1e',penSize=2,isEraser=false,lastX=0,lastY=0;
+
+function initCanvas() {
+  canvas=document.getElementById('drawCanvas');
+  const w=canvas.parentElement.clientWidth;
+  canvas.width=w; canvas.height=Math.min(w*0.55,320);
+  canvas.style.height=canvas.height+'px';
+  ctx=canvas.getContext('2d');
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  canvas.addEventListener('pointerdown',startDraw);
+  canvas.addEventListener('pointermove',draw);
+  canvas.addEventListener('pointerup',endDraw);
+  canvas.addEventListener('pointercancel',endDraw);
+  canvas.addEventListener('pointerleave',endDraw);
+}
+function getPos(e){
+  const r=canvas.getBoundingClientRect();
+  return{x:(e.clientX-r.left)*(canvas.width/r.width),y:(e.clientY-r.top)*(canvas.height/r.height)};
+}
+function startDraw(e){
+  e.preventDefault();isDrawing=true;
+  const p=getPos(e);lastX=p.x;lastY=p.y;
+  ctx.beginPath();ctx.arc(lastX,lastY,(isEraser?penSize*4:penSize)/2,0,Math.PI*2);
+  ctx.fillStyle=isEraser?'#fff':penColor;ctx.fill();
+}
+function draw(e){
+  if(!isDrawing)return;e.preventDefault();
+  const p=getPos(e);
+  ctx.beginPath();ctx.moveTo(lastX,lastY);ctx.lineTo(p.x,p.y);
+  ctx.strokeStyle=isEraser?'#fff':penColor;ctx.lineWidth=isEraser?penSize*4:penSize;
+  ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
+  lastX=p.x;lastY=p.y;
+}
+function endDraw(){isDrawing=false;}
+function selectColor(c,el){
+  penColor=c;isEraser=false;
+  document.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('eraserBtn').classList.remove('active');
+}
+function selectSize(s,el){
+  penSize=s;
+  document.querySelectorAll('.pen-size-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+function toggleEraser(){
+  isEraser=!isEraser;
+  document.getElementById('eraserBtn').classList.toggle('active',isEraser);
+}
+function clearCanvas(){
+  if(!confirm('手書きをすべて消去しますか？'))return;
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+}
+function saveCanvas(){
+  const dataUrl=canvas.toDataURL('image/png');
+  if(!allCanvases[selectedDateStr])allCanvases[selectedDateStr]=[];
+  const now=new Date();
+  allCanvases[selectedDateStr].push({
+    id:Date.now(),data:dataUrl,
+    time:now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
+  });
+  saveCanvases();
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+  loadCanvasImages();alert('保存しました！');
+}
+function loadCanvasImages(){
+  const list=document.getElementById('savedCanvasList');
+  const canvases=allCanvases[selectedDateStr]||[];
+  if(canvases.length===0){list.innerHTML='';return;}
+  list.innerHTML=canvases.map(c=>`
+    <div class="saved-canvas-item">
+      <div class="saved-canvas-top">
+        <span class="saved-canvas-time">✏️ ${c.time}</span>
+        <button class="btn-del-canvas" onclick="deleteCanvas(${c.id})">削除</button>
+      </div>
+      <img class="saved-canvas-img" src="${c.data}" />
+    </div>`).join('');
+}
+function deleteCanvas(id){
+  if(!confirm('削除しますか？'))return;
+  allCanvases[selectedDateStr]=(allCanvases[selectedDateStr]||[]).filter(c=>c.id!==id);
+  saveCanvases();loadCanvasImages();
+}
+
+function shareToLine(){
+  const d=new Date(selectedDateStr+'T00:00:00');
+  const label=d.toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'});
+  const memos=allMemos[selectedDateStr]||[];
+  const canvases=allCanvases[selectedDateStr]||[];
+  if(memos.length===0&&canvases.length===0){alert('この日のメモがありません');return;}
+  let text=`【${label}のメモ】\n─────────────\n`;
+  memos.filter(m=>!m.done).forEach(m=>{const tag=getTag(m.tag);text+=`${tag.icon}[${m.tag}] ${m.text}\n`;});
+  const done=memos.filter(m=>m.done);
+  if(done.length>0){text+=`─────────────\n✅ 完了(${done.length}件)\n`;done.forEach(m=>{text+=`✓ ${m.text}\n`;});}
+  if(canvases.length>0)text+=`\n✏️ 手書きメモ: ${canvases.length}件あり\n`;
+  window.open('https://line.me/R/share?text='+encodeURIComponent(text),'_blank');
+}
+
+function escHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+renderDetail();
+renderCalendar();
+</script>
+</body>
+</html>
