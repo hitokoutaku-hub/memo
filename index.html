@@ -89,8 +89,13 @@ body { display: flex; flex-direction: column; }
 .btn-eraser.active { background: #e8380d; color: #fff; }
 .btn-clear-canvas { padding: 3px 8px; border: 1.5px solid var(--border); border-radius: 6px; background: var(--bg); font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; color: var(--sub); margin-left: auto; }
 .btn-save-canvas { padding: 3px 10px; border: none; border-radius: 6px; background: #1e1e1e; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; color: #fff; }
-.canvas-wrap { background: #fff; border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; touch-action: none; }
-canvas { display: block; width: 100%; cursor: crosshair; }
+.canvas-wrap { 
+  background: #fffef8;
+  background-image: linear-gradient(to right, #d8d4c8 1px, transparent 1px), linear-gradient(to bottom, #d8d4c8 1px, transparent 1px);
+  background-size: 24px 24px;
+  border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; touch-action: none;
+}
+canvas { display: block; width: 100%; cursor: crosshair; background: transparent; }
 .saved-canvas-item { background: var(--card); border-radius: 8px; padding: 8px; margin-bottom: 8px; margin-top: 10px; border: 1.5px solid var(--border); }
 .saved-canvas-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .saved-canvas-time { font-size: 11px; color: var(--sub); font-weight: 700; }
@@ -458,10 +463,10 @@ let canvas,ctx,isDrawing=false,penColor='#1e1e1e',penSize=2,isEraser=false,lastX
 function initCanvas() {
   canvas=document.getElementById('drawCanvas');
   const w=canvas.parentElement.clientWidth;
-  canvas.width=w; canvas.height=Math.min(w*0.55,320);
+  canvas.width=w; canvas.height=Math.min(w*1.4,600);
   canvas.style.height=canvas.height+'px';
   ctx=canvas.getContext('2d');
-  ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
   canvas.addEventListener('pointerdown',startDraw);
   canvas.addEventListener('pointermove',draw);
   canvas.addEventListener('pointerup',endDraw);
@@ -504,7 +509,7 @@ function toggleEraser(){
 }
 function clearCanvas(){
   if(!confirm('手書きをすべて消去しますか？'))return;
-  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 }
 function saveCanvas(){
   const dataUrl=canvas.toDataURL('image/png');
@@ -515,7 +520,7 @@ function saveCanvas(){
     time:now.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})
   });
   saveCanvases();
-  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
   loadCanvasImages();alert('保存しました！');
 }
 function loadCanvasImages(){
