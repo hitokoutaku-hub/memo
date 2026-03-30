@@ -289,7 +289,7 @@ function addMemo() {
 }
 
 document.getElementById('memoInput').addEventListener('keydown', e=>{
-  if (e.key==='Enter'&&!e.shiftKey){e.preventDefault();addMemo();}
+  if (e.key==='Enter'&&e.shiftKey){e.preventDefault();addMemo();}
 });
 
 function renderMemoList() {
